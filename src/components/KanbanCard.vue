@@ -18,7 +18,3 @@ export default {
     props: ['card']
 }
 </script>
-
-<style>
-
-</style>
