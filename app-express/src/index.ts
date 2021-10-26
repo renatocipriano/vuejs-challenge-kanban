@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import columnsRouter from './routers/columns-router'
+import cardsRouter from './routers/cards-router'
 
 
 
@@ -27,6 +28,7 @@ app.use(cors())
 
 // Rotas
 app.use('/api', columnsRouter)
+app.use('/api', cardsRouter)
 
 
 // Resposta padrão para quaisquer outras requisições:

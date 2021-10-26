@@ -1,87 +1,119 @@
 <template>
-    <div class="col-12 col-lg-6 col-xl-3 mb-2 mt-2 kankan-column">
-        <div class="card card-border-primary">
-            <div class="card-header">
-                <div class="card-actions float-right">
-                    <form action="">
-                        <div class="row mb-2">
-                            <div class="col-4"><a href="#" class="btn text-white btn-secondary btn-block" @click.prevent="sortCards()">Sort</a></div>
-                            <div class="col-4"><a href="#" class="btn text-white btn-primary btn-block" :class="disableButton()" @click.prevent="editing = true">Edit</a></div>
-                            <div class="col-4"><a href="#" class="btn text-white btn-danger btn-block" :class="disableButton()" @click.prevent="deleteColumn()">Delete</a></div>
-                        </div>
-                        
-                        <input class="w-100 mb-1" type="text" v-model="form.name" :disabled="!editing">
-                        <input class="w-100 mb-1" type="text" v-model="form.description" :disabled="!editing">
-
-                        <div class="row mb-2" v-if="editing">
-                            <div class="col-6"><button type="submit" class="btn btn-success btn-block" @click.prevent="updateColumn()">Save</button></div>
-                            <div class="col-6"><a href="#" class="btn text-white btn-secondary btn-block" @click.prevent="setUp()">Cancel</a></div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="card-body p-3">
-
-                <kanban-card v-for="card in column.cards" :key="card._id" :card="card"/>
-
-                <a href="#" class="btn btn-success btn-block">Add new Card</a>
-            </div>
+  <div class="col-12 col-lg-6 col-xl-3 mb-2 mt-2 kankan-column">
+    <div class="card card-border-primary">
+      <div class="card-header">
+        <div class="card-actions float-right">
+          <div class="row">
+            <kanban-column-header :column="column" :url="url" />
+          </div>
         </div>
+      </div>
+      <div class="card-body p-3">
+        <kanban-card
+          v-for="card in cards"
+          :key="card.id"
+          :card="card"
+          :column="column"
+          @updateColumnCard="updateColumnCard"
+          @deleteColumnCard="deleteColumnCard"
+        />
+
+        <div class="row mb-2" v-if="creating">
+          <kanban-card :new="creating" @storeColumnCard="storeColumnCard" />
+        </div>
+        <a
+          href="#"
+          class="btn btn-success btn-block"
+          @click.prevent="addNewCard"
+          >Add new Card</a
+        >
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
-import KanbanCard from './KanbanCard.vue';
-import axios from 'axios';
+import axios from "axios";
+import KanbanCard from "./KanbanCard.vue";
+import KanbanColumnHeader from "./KanbanColumnHeader.vue";
 
 export default {
-    components: {
-        'kanban-card': KanbanCard
+  components: {
+    "kanban-card": KanbanCard,
+    "kanban-column-header": KanbanColumnHeader,
+  },
+  props: ["column"],
+  emits: ["accepted"],
+  data: () => {
+    return {
+      cards: [],
+      creating: false,
+      editing: false,
+      sort: true,
+      url: "",
+      form: {
+        name: null,
+        description: null,
+        position: null,
+      },
+    };
+  },
+  mounted() {
+    this.setUp();
+    let url = `${this.url}/cards`;
+    axios.get(url).then((responseCard) => {
+      this.cards = responseCard.data;
+    });
+  },
+  methods: {
+    setUp() {
+      this.creating = false;
+      this.editing = false;
+      this.form = {
+        name: this.column.name,
+        description: this.column.description,
+        position: this.column.position,
+      };
+      this.url = `http://192.168.0.106:4000/api/columns/${this.column.id}`;
     },
-    props: ['column'],
-    data: () => {
-        return {
-            editing: false,
-            urlApi: null,
-            form: {
-                name: null,
-                description: null,
-                position: null,
-            }
-        }
+    sortCards() {
+      this.sort = !this.sort;
+      if (this.sort) {
+        this.cards.sort((a, b) => (a.position > b.position ? 1 : -1));
+      } else {
+        this.cards.sort((a, b) => (a.position < b.position ? 1 : -1));
+      }
     },
-    mounted() {
-        this.setUp();
+    addNewCard() {
+      this.creating = true;
     },
-    methods: {
-        setUp() {
-            this.editing = false;
-            this.form = {
-                name : this.column.name,
-                description : this.column.description,
-                position : this.column.position,
-            }
-            this.urlApi = `http://192.168.0.106:4000/api/columns/${this.column.id}`;
-        },
-        disableButton() {
-            return this.editing ? 'disabled' : '';
-        },
-        sortCards() {
+    storeColumnCard(card) {
+      this.creating = false;
+      this.cards.push(card);
+    },
+    updateColumnCard(card) {
+      this.editing = false;
+      var index = this.cards.findIndex(function (item) {
+        return item.id === card.id;
+      });
+      if (index !== -1) {
+        this.cards[index] = card;
+      }
+    },
+    deleteColumnCard(card) {
+      var index = this.cards.findIndex(function (item) {
+        return item.id === card.id;
+      });
 
-        },
-        deleteColumn() {
-            axios.delete(this.urlApi)
-                .then(() => {
-                    this.$emit('deleteColumnChild', this.column);
-                });
-        },
-        updateColumn() {
-            axios.put(this.urlApi, this.form)
-                .then((response) => {
-                    this.editing = false;
-                    this.$emit('updateColumnChild', response.data)
-                });
-        },
-    }
-}
+      if (index !== -1) {
+        this.cards.splice(index, 1);
+      }
+    },
+  },
+};
 </script>
+<style scoped>
+.card-header {
+  background: gainsboro;
+}
+</style>

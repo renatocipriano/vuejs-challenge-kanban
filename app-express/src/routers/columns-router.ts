@@ -1,5 +1,6 @@
 import express from 'express'
 import Column from '../models/Column'
+import cardsRepository from '../repositories/cards-repository'
 import columnsRepository from '../repositories/columns-repository'
 
 
@@ -36,6 +37,11 @@ columnsRouter.get('/columns/:id', (req, res) => {
             res.status(404).send()
         }
     })
+})
+
+columnsRouter.get('/columns/:id/cards', (req, res) => {
+    const id: number = +req.params.id
+    cardsRepository.cardsColumn(id,(columns) => res.json(columns))
 })
 
 columnsRouter.put('/columns/:id', (req, res) => {

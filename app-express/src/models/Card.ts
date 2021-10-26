@@ -1,8 +1,9 @@
-type Column = {
+type Card = {
     id?: number
+    id_column: number
     name: string
     description: string
     position: number
-    cards: any
+    checked: number
 }
-export default Column
+export default Card

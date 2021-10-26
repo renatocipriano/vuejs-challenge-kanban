@@ -2,16 +2,9 @@
 <main class="content">
 
     <div class="container p-0">
-        <ul>
-          <li class="text-left">npm run serve (http://192.168.0.106:8080)</li>
-          <li class="text-left">yarn dev (http://192.168.0.106:4000/api/)</li>
-        </ul>
-
-
-        <ul>
-          <li v-for="column in columns" :key="column._id">
-            {{column}}
-          </li>
+        <ul style="display:none">
+          <li class="text-left">cd /home/ist-sd/dev/study/vuejs-challenge-kanban/app-express && yarn dev (http://192.168.0.106:4000/api/)</li>
+          <li class="text-left">cd /home/ist-sd/dev/study/vuejs-challenge-kanban/ && npm run serve (http://192.168.0.106:8080)</li>
         </ul>
       
         <h1 class="h3 mb-3">Kanban Board</h1>
@@ -49,24 +42,32 @@ export default {
   components: {
     "kanban-column": KanbanColumn
   },
+  emits: ['accepted'],
   data() {
     return {
       urlApi: 'http://192.168.0.106:4000/api/columns',
       columns: [],
-      column: {
+      column: {}
+    }
+  },
+  beforeMount() {
+    this.setUp();
+    axios.get(this.urlApi)
+      .then((response) => {
+        this.columns = response.data;         
+      });
+  },
+  methods: {
+    accepted() {
+      console.log('capturou');
+    },
+    setUp() {
+      this.column = {
         name: null,
         description: null,
         position: 0
       }
-    }
-  },
-  beforeMount() {
-    axios.get(this.urlApi)
-        .then((response) => {
-          this.columns = response.data;
-        });
-  },
-  methods: {
+    },
     updateColumnChild(column) {
       var index = this.columns.findIndex(function(item){
           return item.id === column.id;
@@ -74,6 +75,7 @@ export default {
       if (index !== -1) { this.columns[index] = column; }
     },
     deleteColumnChild(column) {
+      console.log('app escutou deleteColumnChild')
       var index = this.columns.findIndex(function(item){
           return item.id === column.id;
       })
@@ -83,13 +85,9 @@ export default {
       axios.post(this.urlApi,this.column)
         .then((response) => {
           this.columns.push(response.data);
-          this.column = {
-            name: null,
-            description: null,
-            position: 0
-          }
+          this.setUp();
         });
-    }
+    },
   }
 }
 </script>
