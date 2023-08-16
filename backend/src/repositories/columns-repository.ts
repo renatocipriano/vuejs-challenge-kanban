@@ -12,7 +12,7 @@ const columnsRepository = {
             column.description
         ]
 
-        database.run(sql, params, function(_err) {
+        database.run(sql, params, function (_err) {
             callback(this?.lastID)
         })
     },
@@ -42,15 +42,21 @@ const columnsRepository = {
             column.position,
             id
         ]
-        database.run(sql, params, function(_err) {
+        database.run(sql, params, function (_err) {
             callback(this.changes === 0)
         })
 
     },
     apagar: (id: number, callback: (notFound: boolean) => void) => {
-        const sql = 'DELETE FROM columns WHERE id = ?'
-        const params = [id]
-        database.run(sql, params, function(_err) {
+        const sqlCards = 'DELETE FROM cards WHERE id_column = ?'
+        const paramsCards = [id]
+        database.run(sqlCards, paramsCards, function (_err) {
+            callback(this.changes === 0)
+        })
+
+        const sqlColumns = 'DELETE FROM columns WHERE id = ?'
+        const paramsColumns = [id]
+        database.run(sqlColumns, paramsColumns, function (_err) {
             callback(this.changes === 0)
         })
     },
