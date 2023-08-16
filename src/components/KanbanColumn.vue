@@ -4,22 +4,20 @@
       <div class="card-header">
         <div class="card-actions float-right">
           <div class="row">
-            <kanban-column-header :column="column" :url="url" />
+            <kanban-column-header :column="column" />
           </div>
         </div>
       </div>
       <div class="card-body p-3">
         <kanban-card
-          v-for="card in cards"
+          v-for="card in column.cards"
           :key="card.id"
           :card="card"
           :column="column"
-          @updateColumnCard="updateColumnCard"
-          @deleteColumnCard="deleteColumnCard"
         />
 
         <div class="row mb-2" v-if="creating">
-          <kanban-card :new="creating" @storeColumnCard="storeColumnCard" />
+          <kanban-card :new="creating"/>
         </div>
         <a
           href="#"
@@ -33,7 +31,6 @@
 </template>
 
 <script>
-import axios from "axios";
 import KanbanCard from "./KanbanCard.vue";
 import KanbanColumnHeader from "./KanbanColumnHeader.vue";
 
@@ -46,7 +43,6 @@ export default {
   emits: ["accepted"],
   data: () => {
     return {
-      cards: [],
       creating: false,
       editing: false,
       sort: true,
@@ -59,14 +55,17 @@ export default {
     };
   },
   mounted() {
+    /*
     this.setUp();
     let url = `${this.url}/cards`;
     axios.get(url).then((responseCard) => {
       this.cards = responseCard.data;
     });
+    */
   },
   methods: {
     setUp() {
+
       this.creating = false;
       this.editing = false;
       this.form = {
@@ -74,19 +73,12 @@ export default {
         description: this.column.description,
         position: this.column.position,
       };
-      this.url = `http://192.168.0.106:4000/api/columns/${this.column.id}`;
-    },
-    sortCards() {
-      this.sort = !this.sort;
-      if (this.sort) {
-        this.cards.sort((a, b) => (a.position > b.position ? 1 : -1));
-      } else {
-        this.cards.sort((a, b) => (a.position < b.position ? 1 : -1));
-      }
+      //this.url = `http://192.168.0.106:4000/api/columns/${this.column.id}`;
     },
     addNewCard() {
       this.creating = true;
     },
+    /*
     storeColumnCard(card) {
       this.creating = false;
       this.cards.push(card);
@@ -108,7 +100,7 @@ export default {
       if (index !== -1) {
         this.cards.splice(index, 1);
       }
-    },
+    },*/
   },
 };
 </script>

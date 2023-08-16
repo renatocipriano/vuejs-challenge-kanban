@@ -1,93 +1,55 @@
 <template>
-<main class="content">
-
+  <main class="content">
     <div class="container p-0">
-        <ul style="display:none">
-          <li class="text-left">cd /home/ist-sd/dev/study/vuejs-challenge-kanban/app-express && yarn dev (http://192.168.0.106:4000/api/)</li>
-          <li class="text-left">cd /home/ist-sd/dev/study/vuejs-challenge-kanban/ && npm run serve (http://192.168.0.106:8080)</li>
-        </ul>
-      
-        <h1 class="h3 mb-3">Kanban Board</h1>
+      <ul style="display: none">
+        <li class="text-left">
+          cd /home/ist-sd/dev/study/vuejs-challenge-kanban/app-express && yarn
+          dev (http://192.168.0.106:4000/api/)
+        </li>
+        <li class="text-left">
+          cd /home/ist-sd/dev/study/vuejs-challenge-kanban/ && npm run serve
+          (http://192.168.0.106:8080)
+        </li>
+      </ul>
 
-        <form @submit.prevent="storeColumn()">
-          <div class="row">
-            <div class="col-4">
-              <input type="text" class="w-100 form-control" id="inputName" required placeholder="Name" v-model="column.name">
-            </div>
-            <div class="col-4">
-              <input type="text" class="w-100 form-control" id="inputName" required placeholder="Description" v-model="column.description">
-            </div>
-            <div class="col-4">
-              <button type="submit" class="w-100 btn btn-success mb-3">New Column</button>
-            </div>
-          </div>
-        </form>
+      <h1 class="h3 mb-3">Kanban Board</h1>
 
-        <div class="row" id="kankan-columns">
-            <kanban-column 
-              @updateColumnChild="updateColumnChild"
-              @deleteColumnChild="deleteColumnChild"
-              v-for="column in columns" :key="column._id" :column="column"/>
-        </div>
+      <notification />
+      <kanban-column-form />
+
+      <div class="row" id="kankan-columns" v-if="getColumns()">
+        <kanban-column
+          v-for="column in getColumns()"
+          :key="columnKey(column)"
+          :column="column"
+        />
+      </div>
     </div>
-</main>
+  </main>
 </template>
 
 <script>
-import KanbanColumn from './components/KanbanColumn.vue';
-import axios from 'axios';
+import KanbanColumn from "./components/KanbanColumn.vue";
+import KanbanColumnForm from "./components/KanbanColumnForm.vue";
+import Notification from "./components/Notification.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    "kanban-column": KanbanColumn
-  },
-  emits: ['accepted'],
-  data() {
-    return {
-      urlApi: 'http://192.168.0.106:4000/api/columns',
-      columns: [],
-      column: {}
-    }
+    "kanban-column": KanbanColumn,
+    "kanban-column-form": KanbanColumnForm,
+    "notification": Notification,
   },
   beforeMount() {
-    this.setUp();
-    axios.get(this.urlApi)
-      .then((response) => {
-        this.columns = response.data;         
-      });
+    this.$store.commit("setColumns");
   },
   methods: {
-    accepted() {
-      console.log('capturou');
+    getColumns() {
+      return this.$store.state.columns
     },
-    setUp() {
-      this.column = {
-        name: null,
-        description: null,
-        position: 0
-      }
-    },
-    updateColumnChild(column) {
-      var index = this.columns.findIndex(function(item){
-          return item.id === column.id;
-      })
-      if (index !== -1) { this.columns[index] = column; }
-    },
-    deleteColumnChild(column) {
-      console.log('app escutou deleteColumnChild')
-      var index = this.columns.findIndex(function(item){
-          return item.id === column.id;
-      })
-      if (index !== -1) { this.columns.splice(index, 1); }
-    },
-    storeColumn() {
-      axios.post(this.urlApi,this.column)
-        .then((response) => {
-          this.columns.push(response.data);
-          this.setUp();
-        });
-    },
-  }
-}
+    columnKey(column) {
+      return new URLSearchParams(column).toString();
+    }
+  },
+};
 </script>

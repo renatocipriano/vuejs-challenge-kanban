@@ -3,7 +3,7 @@
     <div class="card-actions float-right">
       <div class="row">
         <div class="col-10">
-          <form action="">
+          <form @submit.prevent="updateEmit()">
             <input
               required
               class="w-100 mb-1"
@@ -25,7 +25,6 @@
                 <button
                   type="submit"
                   class="btn btn-sm btn-success btn-inline mr-2"
-                  @click.prevent="updateColumnSave()"
                 >
                   Save
                 </button>
@@ -68,7 +67,7 @@
                       href="#"
                       class="btn btn-sm text-white btn-danger btn-block"
                       :class="disableButton()"
-                      @click.prevent="deleteColumn()"
+                      @click.prevent="deleteEmit()"
                       >Delete</a
                     >
                   </li>
@@ -83,15 +82,10 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
   props: {
     column: {
       type: Object,
-      required: true,
-    },
-    url: {
-      type: String,
       required: true,
     },
   },
@@ -99,30 +93,29 @@ export default {
     return {
       editing: false,
       form: Object,
+      sort: true,
     };
   },
   beforeMount() {
     this.form = this.column;
   },
   methods: {
-    accepted() {
-      this.$root.$emit('accepted')
-      //this.$nuxt.$emit('accepted')
+    updateEmit() {
+      this.$store.commit("updateColumn", this.form);
+      this.editing = false;
+    },
+    deleteEmit() {
+      this.$store.commit("deleteColumn", this.column);
     },
     disableButton() {
       return this.editing ? "disabled" : "";
     },
-    updateColumnSave() {
-      axios.put(this.url, this.form).then((response) => {
-        this.editing = false;
-        this.$emit("updateColumnChild", response.data);
+    sortCards() {
+      this.$store.commit("sortColumnCards", {
+        id: this.column.id,
+        sort: this.sort,
       });
-    },
-    deleteColumn() {
-      axios.delete(this.url).then(() => {
-        console.log('KanbanColumnHeader emitiu deleteColumn');
-        this.$emit("deleteColumnChild", this.column);
-      });
+      this.sort = !this.sort;
     },
   },
 };

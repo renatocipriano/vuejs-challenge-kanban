@@ -51,7 +51,7 @@
             <a
               href="#"
               class="btn text-white btn-danger btn-block"
-              @click.prevent="deleteCard()"
+              @click.prevent="this.$store.commit('deleteCard', this.card);"
               >Delete</a
             >
           </div>
@@ -62,12 +62,10 @@
 </template>
 
 <script>
-import axios from "axios";
-
 export default {
   props: {
-    card: { type: Object},
-    column: { type: Object, required:true },
+    card: { type: Object },
+    column: { type: Object, required: false },
     new: { type: Boolean, default: false },
   },
   data: () => {
@@ -99,7 +97,9 @@ export default {
       this.form.id_column = this.$parent.column.id;
     },
     handleSubmit() {
-      this.new ? this.storeCard() : this.updateCard();
+      this.new ? 
+        this.$store.commit("storeCard", this.form) : 
+        this.$store.commit("updateCard", this.form);
     },
     modeEditing() {
       this.editing = !this.editing;
@@ -108,27 +108,7 @@ export default {
       if (this.new || this.editing) {
         return false;
       }
-      
       return true;
-    },
-    deleteCard() {
-      let url = this.urlApi + this.card.id;
-      axios.delete(url).then(() => {
-        this.$emit("deleteColumnCard", this.card);
-      });
-    },
-    storeCard() {
-      axios.post(this.urlApi, this.form).then((response) => {
-        this.$emit("storeColumnCard", response.data);
-        this.setUp();
-      });
-    },
-    updateCard() {
-      let url = this.urlApi + this.card.id;
-      axios.put(url, this.form).then((response) => {
-        this.$emit("updateColumnCard", response.data);
-        this.editing = false;
-      });
     },
   },
 };
