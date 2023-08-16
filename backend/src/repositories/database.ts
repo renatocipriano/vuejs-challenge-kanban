@@ -1,5 +1,5 @@
 import sqlite3 from 'sqlite3'
-const DBSOURCE = 'db.sqlite'
+const DBSOURCE = 'database/db.sqlite'
 const SQL_COLUMNS_CREATE = `
     CREATE TABLE columns (
         id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
