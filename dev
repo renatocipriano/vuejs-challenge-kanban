@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Execute o comando 'npm run serve' dentro do diretório 'backend'
+echo "Iniciando o servidor do backend..."
+cd backend
+npm run serve &
+
+# Aguarde um momento para o servidor do backend iniciar
+sleep 5
+
+# Execute o comando 'npm run serve' dentro do diretório 'frontend'
+echo "Iniciando o servidor do frontend..."
+cd ../frontend
+npm run serve
+
+# Volte ao diretório inicial
+cd ..
