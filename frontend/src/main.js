@@ -11,12 +11,12 @@ const URL_API_CARDS = `/cards/`
 const http = axios.create({
     baseURL: process.env.VUE_APP_API_URL,
     headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
     }
-  });
-  
+});
+
 const emitters = createStore({
     state() {
         return {
@@ -27,14 +27,13 @@ const emitters = createStore({
     mutations: {
         updateNotification(state, message) {
             state.message = message;
-            setTimeout(function() {
+            setTimeout(function () {
                 state.message = null;
             }, 3000)
         },
 
         // columns
         setColumns(state) {
-            console.log(URL_API_COLUMNS)
             http.get(URL_API_COLUMNS).then((response) => {
                 state.columns = response.data;
                 emitters.commit("setColumnCards");
@@ -50,7 +49,7 @@ const emitters = createStore({
         updateColumn(state, newColumn) {
             http.put(`${URL_API_COLUMNS}${newColumn.id}`, newColumn).then((response) => {
                 let updatedColumn = response.data,
-                    index = state.columns.findIndex(function(item) {
+                    index = state.columns.findIndex(function (item) {
                         return item.id === updatedColumn.id;
                     });
                 if (index !== -1) {
@@ -61,7 +60,7 @@ const emitters = createStore({
         },
         deleteColumn(state, column) {
             http.delete(`${URL_API_COLUMNS}${column.id}`).then(() => {
-                var index = state.columns.findIndex(function(item) {
+                var index = state.columns.findIndex(function (item) {
                     return item.id === column.id;
                 });
                 if (index !== -1) {
@@ -102,15 +101,10 @@ const emitters = createStore({
                 });
         },
         updateCard(state, card) {
-            console.log('updateCard')
-            console.log(card)
-                /*
-                let url = this.urlApi + this.card.id;
-                http.put(url, this.form).then((response) => {
-                    this.$emit("updateColumnCard", response.data);
-                    this.editing = false;
-                });
-                */
+            http.put(URL_API_CARDS + card.id, card).then((response) => {
+                let msg = response.status == 200 ? "Card atualizado com sucesso." : "Erro ao atualizar o card."
+                emitters.commit("updateNotification", msg);
+            });
         },
         deleteCard(state, card) {
             http.delete(`${URL_API_CARDS}${card.id}`).then(() => {

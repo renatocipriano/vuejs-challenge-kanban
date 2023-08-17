@@ -94,7 +94,7 @@ export default {
         this.form = this.$props.card;
       }
       this.urlApi = `/cards/`;
-      this.form.id_column = this.$parent.column.id;
+      this.form.id_column = this.column.id;
     },
     handleSubmit() {
       this.new ? 

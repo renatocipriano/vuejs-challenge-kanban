@@ -34,8 +34,9 @@ const cardsRepository = {
     },
     atualizar: (id: number, card: Card, callback: (notFound: boolean) => void) => {
 
-        const sql = 'UPDATE cards SET name = ?, description = ? , position = ? , checked = ? WHERE id = ?'
+        const sql = 'UPDATE cards SET id_column = ?, name = ?, description = ? , position = ? , checked = ? WHERE id = ?'
         const params = [
+            card.id_column,
             card.name,
             card.description,
             card.position,
