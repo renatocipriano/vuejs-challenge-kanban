@@ -38,3 +38,8 @@ Os cards devem exibir:
 ## Disclaimer
 
 O código fonte que você produzir será utilizado somente para avaliar sua aptidão para a vaga. Não será feito nenhum uso comercial do código fonte, tampouco haverá a exigência de direitos de atribuição.
+
+
+Instalação:
+cd backend && npm dev
+cd frontend && npm run serve
